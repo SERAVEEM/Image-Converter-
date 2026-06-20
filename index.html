@@ -4,10 +4,118 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>image-converter</title>
+    <title>OptiShift | Premium Local Image Converter</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div class="app-container">
+      
+      <!-- Top Header -->
+      <header>
+        <div class="logo-group">
+          <h1>OptiShift</h1>
+          <p>Local-first, high-fidelity WebP & AVIF image converter</p>
+        </div>
+        <div>
+          <span class="badge">Offline Secured</span>
+        </div>
+      </header>
+
+      <!-- Main Layout Grid -->
+      <main class="workspace-grid">
+        
+        <!-- Workspace Panel (Left Side) -->
+        <section class="panel-left">
+          
+          <!-- Drag & Drop Zone -->
+          <div class="glass-card dropzone" id="dropzone">
+            <input type="file" id="file-input" accept="image/png, image/jpeg, image/jpg" multiple style="display: none;" />
+            <div class="dropzone-content">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="upload-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              <h3>Drag and drop your images here</h3>
+              <p>Supports PNG, JPG, JPEG up to 20MB</p>
+              <button class="btn btn-primary" id="browse-btn">Browse Files</button>
+            </div>
+          </div>
+
+          <!-- Active Preview / Before-After Comparison Slider (Hidden initially) -->
+          <div class="glass-card preview-card hidden" id="preview-card">
+            <div class="comparison-container" id="comparison-container">
+              <img id="image-before" class="comparison-image" alt="Original Image" />
+              <div class="comparison-after-wrapper" id="comparison-after-wrapper">
+                <img id="image-after" class="comparison-image" alt="Compressed Image" />
+              </div>
+              <div class="slider-handle" id="slider-handle">
+                <div class="handle-line"></div>
+                <div class="handle-button">↔</div>
+                <div class="handle-line"></div>
+              </div>
+            </div>
+            <div class="preview-labels">
+              <span class="label-badge label-before">Original</span>
+              <span class="label-badge label-after">Preview</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Controls & Queue Panel (Right Side) -->
+        <section class="panel-right">
+          
+          <!-- Conversion Configuration Card -->
+          <div class="glass-card controls-card">
+            <h2>Compression Settings</h2>
+            
+            <div class="control-group">
+              <label>Target Format</label>
+              <div class="format-toggle">
+                <button class="toggle-btn active" data-format="webp">WebP</button>
+                <button class="toggle-btn" data-format="avif">AVIF</button>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <div class="control-header">
+                <label for="quality-slider">Quality</label>
+                <span id="quality-val">80%</span>
+              </div>
+              <input type="range" id="quality-slider" min="5" max="100" value="80" class="slider" />
+            </div>
+
+            <div class="control-group">
+              <div class="control-header">
+                <label for="scale-slider">Scale Resolution</label>
+                <span id="scale-val">100%</span>
+              </div>
+              <input type="range" id="scale-slider" min="10" max="100" value="100" class="slider" />
+            </div>
+          </div>
+
+          <!-- Queue List & Export Action Card -->
+          <div class="glass-card queue-card">
+            <div class="queue-header">
+              <h2>Processing Queue</h2>
+              <span class="queue-count" id="queue-count">0 files</span>
+            </div>
+            
+            <!-- Items Container -->
+            <div class="queue-list" id="queue-list">
+              <div class="queue-empty" id="queue-empty">
+                <p>No images in queue yet. Upload images to start.</p>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="queue-actions hidden" id="queue-actions">
+              <button class="btn btn-primary" id="convert-all-btn">Convert All & Save ZIP</button>
+              <button class="btn btn-danger" id="clear-all-btn">Clear All</button>
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

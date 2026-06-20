@@ -1,0 +1,22 @@
+/* src/styles/cards.css */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-neon);
+  transition: border-color var(--transition-medium), box-shadow var(--transition-medium);
+}
+
+.glass-card:hover {
+  border-color: var(--border-color-hover);
+  box-shadow: var(--shadow-neon), var(--shadow-glow);
+}
+
+@media (max-width: 768px) {
+  .glass-card {
+    padding: 1.25rem;
+  }
+}

@@ -1,0 +1,12 @@
+/* src/style.css */
+@import './styles/variables.css';
+@import './styles/reset.css';
+@import './styles/scrollbar.css';
+@import './styles/layout.css';
+@import './styles/cards.css';
+@import './styles/buttons.css';
+@import './styles/badges.css';
+@import './styles/inputs.css';
+@import './styles/dropzone.css';
+@import './styles/comparison.css';
+@import './styles/queue.css';
