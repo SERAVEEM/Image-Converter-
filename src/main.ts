@@ -4,7 +4,7 @@ import { Dropzone } from './component/Dropzone';
 import { CompareSlider } from './component/CompareSlider';
 import { Queuelist } from './component/QueueList';
 import { convertImage } from './utils/converterEngine';
-import { downloadBlob } from './utils/fileHelpers';
+import { downloadBlob, formatBytes } from './utils/fileHelpers';
 import JSZip from 'jszip';
 
 // App State
@@ -22,6 +22,27 @@ const formatBtns = document.querySelectorAll('.format-toggle .toggle-btn');
 const previewCard = document.getElementById('preview-card') as HTMLElement;
 const dropzoneEl = document.getElementById('dropzone') as HTMLElement;
 const convertBtn = document.getElementById('convert-all-btn') as HTMLButtonElement;
+
+// Preview stats and loading overlay selectors
+const previewLoading = document.getElementById('preview-loading') as HTMLElement;
+const previewOrigSize = document.getElementById('preview-orig-size') as HTMLElement;
+const previewCompSize = document.getElementById('preview-comp-size') as HTMLElement;
+const previewSavings = document.getElementById('preview-savings') as HTMLElement;
+
+/* Helper to update real-time preview size and savings */
+function updatePreviewStats(originalSize: number, compressedSize: number): void {
+  previewOrigSize.textContent = formatBytes(originalSize);
+  previewCompSize.textContent = formatBytes(compressedSize);
+  
+  const savings = 100 - (compressedSize / originalSize) * 100;
+  if (savings > 0) {
+    previewSavings.textContent = `Saved ${savings.toFixed(0)}%`;
+    previewSavings.className = 'badge badge-savings-success';
+  } else {
+    previewSavings.textContent = `Size increased`;
+    previewSavings.className = 'badge badge-savings-warning';
+  }
+}
 
 // Initialize Components
 const compareSlider = new CompareSlider(
@@ -74,7 +95,9 @@ async function setPreviewImage(file: File): Promise<void> {
   // Show original image in the left comparison pane
   const originalUrl = URL.createObjectURL(file);
   
-  // Run an initial conversion to WebP/AVIF so we have a preview on the right pane
+  // Show loading indicator
+  previewLoading.classList.remove('hidden');
+  
   try {
     const compressedBlob = await convertImage(file, {
       format: selectedFormat,
@@ -85,14 +108,23 @@ async function setPreviewImage(file: File): Promise<void> {
     
     // Load both urls into our interactive slider
     compareSlider.setImages(originalUrl, compressedUrl);
+    
+    // Update stats bar
+    updatePreviewStats(file.size, compressedBlob.size);
   } catch (error) {
     console.error('Failed to generate preview', error);
+  } finally {
+    // Hide loading indicator
+    previewLoading.classList.add('hidden');
   }
 }
 
 /* Regenerates the side-by-side preview whenever quality or format settings are changed */
 async function refreshPreview(): Promise<void> {
   if (!previewFile) return;
+
+  // Show loading indicator
+  previewLoading.classList.remove('hidden');
 
   try {
     const compressedBlob = await convertImage(previewFile, {
@@ -105,8 +137,14 @@ async function refreshPreview(): Promise<void> {
     const compressedUrl = URL.createObjectURL(compressedBlob);
     
     compareSlider.setImages(originalUrl, compressedUrl);
+    
+    // Update stats bar
+    updatePreviewStats(previewFile.size, compressedBlob.size);
   } catch (err) {
     console.error('Failed to refresh preview:', err);
+  } finally {
+    // Hide loading indicator
+    previewLoading.classList.add('hidden');
   }
 }
 
