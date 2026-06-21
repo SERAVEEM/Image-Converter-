@@ -172,3 +172,4 @@ Since OptiShift performs all compression tasks using the CPU and GPU of the loca
 - **No data leaves your device**.
 - No telemetry, analytics, or image caching tracking scripts are embedded.
 - Can run fully offline in a sandbox or flight mode after loading.
+yeah
