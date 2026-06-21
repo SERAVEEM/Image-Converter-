@@ -1,0 +1,47 @@
+/* src/styles/dropzone.css */
+.dropzone {
+  border: 2px dashed var(--border-color);
+  background: var(--bg-card);
+  text-align: center;
+  padding: 3rem 2rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition-medium), background var(--transition-medium);
+}
+
+.dropzone:hover, .dropzone.dragover {
+  border-color: var(--color-primary);
+  background: var(--bg-card-hover);
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.upload-icon {
+  color: var(--text-muted);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.dropzone:hover .upload-icon, .dropzone.dragover .upload-icon {
+  color: var(--color-primary);
+  transform: translateY(-4px);
+}
+
+.dropzone h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dropzone p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
