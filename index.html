@@ -49,7 +49,27 @@
                 <div class="handle-button">↔</div>
                 <div class="handle-line"></div>
               </div>
+              <!-- Real-time Loading Overlay -->
+              <div class="preview-loading-overlay hidden" id="preview-loading">
+                <div class="spinner"></div>
+                <span>Optimizing...</span>
+              </div>
             </div>
+            
+            <!-- Real-time Size Stats Bar -->
+            <div class="preview-stats-bar" id="preview-stats-bar">
+              <div class="stat-item">
+                <span class="stat-label">Original:</span>
+                <span class="stat-value" id="preview-orig-size">-</span>
+              </div>
+              <div class="stat-divider">→</div>
+              <div class="stat-item">
+                <span class="stat-label">Estimated:</span>
+                <span class="stat-value" id="preview-comp-size">-</span>
+              </div>
+              <span class="badge" id="preview-savings">-</span>
+            </div>
+
             <div class="preview-labels">
               <span class="label-badge label-before">Original</span>
               <span class="label-badge label-after">Preview</span>

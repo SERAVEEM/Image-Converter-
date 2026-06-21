@@ -92,3 +92,96 @@
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
 }
+
+/* Real-time stats bar styling */
+.preview-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.87rem;
+}
+
+.stat-label {
+  color: var(--text-secondary);
+}
+
+.stat-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stat-divider {
+  color: var(--text-muted);
+  font-weight: bold;
+}
+
+#preview-savings {
+  margin-left: auto;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Success and warning states for savings badge */
+.badge-savings-success {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #a7f3d0 !important;
+}
+
+.badge-savings-warning {
+  background: rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #fca5a5 !important;
+}
+
+/* Loading Overlay */
+.preview-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(7, 10, 19, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  z-index: 20;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(99, 102, 241, 0.15);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  box-shadow: var(--shadow-glow);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.hidden {
+  display: none !important;
+}
