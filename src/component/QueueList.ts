@@ -1,5 +1,5 @@
 // src/component/QueueList.ts
-import { formatBytes } from '../utils/fileHelpers'; // Fixed: lowercase 'b' to match your file
+import { formatBytes } from '../utils/fileHelpers';
 
 export interface QueueItem {
   id: string;
@@ -7,7 +7,7 @@ export interface QueueItem {
   status: 'pending' | 'processing' | 'success' | 'failed';
   originalSize: number;
   compressedSize?: number;
-  compressedBlob?: Blob; // Fixed: added '?' to make it optional
+  compressedBlob?: Blob;
 }
 
 export class Queuelist {
@@ -17,10 +17,10 @@ export class Queuelist {
   private clearBtnEl: HTMLButtonElement;
   private converBtnEl: HTMLButtonElement;
 
-  private items: QueueItem[] = []; // Fixed: declared the internal items array
+  private items: QueueItem[] = [];
   
   private onClearCallback: () => void;
-  private onConverterCallback: () => void; // Fixed: added missing colon ':'
+  private onConverterCallback: () => void;
 
   constructor(
     listId: string,
@@ -38,22 +38,21 @@ export class Queuelist {
     this.converBtnEl = document.getElementById(convertBtnId) as HTMLButtonElement;
 
     this.onClearCallback = onClear;
-    this.onConverterCallback = onConvert; // Fixed: assign to onConverterCallback
+    this.onConverterCallback = onConvert;
 
     this.initEvents();
   }
 
-  // Fixed: Added the missing initEvents method
   private initEvents(): void {
     this.clearBtnEl.addEventListener('click', () => this.onClearCallback());
     this.converBtnEl.addEventListener('click', () => this.onConverterCallback());
   }
 
-  public getItems(): QueueItem[] { // Changed to public so other files can access items
+  public getItems(): QueueItem[] {
     return this.items;
   }
 
-  public addFiles(files: File[]): void { // Fixed: File type is capitalized
+  public addFiles(files: File[]): void {
     // hide empty queue message
     const emptyEl = document.getElementById('queue-empty');
     if (emptyEl) emptyEl.classList.add('hidden');
@@ -72,7 +71,7 @@ export class Queuelist {
         originalSize: file.size
       };
       
-      this.items.push(item); // Fixed: lowercase 'items'
+      this.items.push(item);
       this.renderItem(item);
     });
     this.updateSummaryCount();
@@ -80,7 +79,7 @@ export class Queuelist {
 
   // update an item's progress bar in the DOM 
   public updateProgress(id: string, progress: number): void {
-    const item = this.items.find((i) => i.id === id); // Fixed: 'const' typo fixed
+    const item = this.items.find((i) => i.id === id);
     if (!item) return;
 
     item.status = 'processing';
@@ -109,6 +108,14 @@ export class Queuelist {
     const savings = 100 - (item.compressedSize / item.originalSize) * 100;
     const savingsText = savings > 0 ? `Saved ${savings.toFixed(0)}%` : 'Size increased';
     
+    // Update status text on the top right
+    const statusEl = document.querySelector(`#${id} .queue-item-status`) as HTMLElement;
+    if (statusEl) {
+      statusEl.textContent = 'Success';
+      statusEl.style.color = 'var(--color-success)';
+      statusEl.style.fontWeight = '600';
+    }
+    
     const metaEl = document.querySelector(`#${id} .queue-item-meta`) as HTMLElement;
     if (metaEl) {
       metaEl.innerHTML = `
@@ -120,12 +127,20 @@ export class Queuelist {
     }
   }
 
-  // Added the missing markFailed method
   public markFailed(id: string, errorMessage: string): void {
     const item = this.items.find((i) => i.id === id);
     if (!item) return;
 
     item.status = 'failed';
+    
+    // Update status text on the top right
+    const statusEl = document.querySelector(`#${id} .queue-item-status`) as HTMLElement;
+    if (statusEl) {
+      statusEl.textContent = 'Failed';
+      statusEl.style.color = 'var(--color-error)';
+      statusEl.style.fontWeight = '600';
+    }
+
     const metaEl = document.querySelector(`#${id} .queue-item-meta`) as HTMLElement;
     if (metaEl) {
       metaEl.innerHTML = `<span style="color: var(--color-error);">${errorMessage}</span>`;
@@ -152,7 +167,7 @@ export class Queuelist {
       <div class="queue-item" id="${item.id}">
         <div class="queue-item-header">
           <span class="queue-item-name" title="${item.file.name}">${item.file.name}</span>
-          <span class="queue-item-meta">Waiting...</span>
+          <span class="queue-item-status" style="color: var(--text-muted); font-size: 0.8rem;">Waiting...</span>
         </div>
         <div class="queue-item-meta">
           <span>Size: ${formatBytes(item.originalSize)}</span>

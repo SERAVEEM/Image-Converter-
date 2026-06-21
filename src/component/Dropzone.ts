@@ -1,7 +1,7 @@
 export class Dropzone {
     private dropzoneEl: HTMLElement;
-    private fileInputEl : HTMLInputElement; //change to HTMLInputElement
-    private browseBtnEl : HTMLInputElement; //change to HTMLInputElement
+    private fileInputEl : HTMLInputElement;
+    private browseBtnEl : HTMLButtonElement;
     private onFilesSelectedCallback : (files : File[]) => void;
 
     constructor (
@@ -11,8 +11,8 @@ export class Dropzone {
         onFilesSelected : (files: File[]) => void  
     ) {
         this.dropzoneEl = document.getElementById(dropZoneId) as HTMLElement;
-        this.fileInputEl = document.getElementById(fileInputId) as HTMLInputElement; //cast to HTMLInputElement
-        this.browseBtnEl = document.getElementById(browseBtnId) as HTMLInputElement; //cast to HTMLInputElement
+        this.fileInputEl = document.getElementById(fileInputId) as HTMLInputElement;
+        this.browseBtnEl = document.getElementById(browseBtnId) as HTMLButtonElement;
         this.onFilesSelectedCallback = onFilesSelected;
 
         this.initEvents();
@@ -47,10 +47,10 @@ export class Dropzone {
 
     private handleFileSelection (filelist: FileList):void {
         const validFiles : File[] = []
-        const allowedTypes = ['image/png', 'image/jpg', 'image/jpg'];
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 
-        for (let i = 0; i< FileList.length; i ++) {
-            const file = filelist[i]
+        for (let i = 0; i < filelist.length; i++) {
+            const file = filelist[i];
             if(allowedTypes.includes(file.type)) {
                 validFiles.push(file);
             } else {
