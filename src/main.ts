@@ -3,6 +3,7 @@ import './style.css';
 import { Dropzone } from './component/Dropzone';
 import { CompareSlider } from './component/CompareSlider';
 import { Queuelist } from './component/QueueList';
+import { VideoReceiver } from './component/VideoReceiver';
 import { convertImage } from './utils/converterEngine';
 import { downloadBlob, formatBytes } from './utils/fileHelpers';
 import JSZip from 'jszip';
@@ -12,6 +13,8 @@ let selectedFormat: 'webp' | 'avif' = 'webp';
 let compressionQuality = 0.8; // 0.8 represents 80%
 let resolutionScale = 1.0;    // 1.0 represents 100%
 let previewFile: File | null = null;
+let activeMode: 'images' | 'videos' = 'images';
+let selectedVideoFile: File | null = null;
 
 // DOM Elements Selection
 const qualitySlider = document.getElementById('quality-slider') as HTMLInputElement;
@@ -44,6 +47,74 @@ function updatePreviewStats(originalSize: number, compressedSize: number): void 
   }
 }
 
+/* Switches the active view mode and adjusts panel visibility */
+function switchMode(mode: 'images' | 'videos'): void {
+  activeMode = mode;
+
+  const imagesTab = document.getElementById('mode-images-btn') as HTMLElement;
+  const videosTab = document.getElementById('mode-videos-btn') as HTMLElement;
+
+  if (mode === 'images') {
+    imagesTab.classList.add('active');
+    videosTab.classList.remove('active');
+
+    // Show image panels
+    if (previewFile) {
+      document.getElementById('preview-card')?.classList.remove('hidden');
+      document.getElementById('dropzone')?.classList.add('hidden');
+    } else {
+      document.getElementById('preview-card')?.classList.add('hidden');
+      document.getElementById('dropzone')?.classList.remove('hidden');
+    }
+    document.getElementById('image-controls-card')?.classList.remove('hidden');
+    document.getElementById('image-queue-card')?.classList.remove('hidden');
+
+    // Hide video panels
+    document.getElementById('video-dropzone')?.classList.add('hidden');
+    document.getElementById('video-preview-card')?.classList.add('hidden');
+    document.getElementById('video-controls-card')?.classList.add('hidden');
+  } else {
+    imagesTab.classList.remove('active');
+    videosTab.classList.add('active');
+
+    // Hide image panels
+    document.getElementById('dropzone')?.classList.add('hidden');
+    document.getElementById('preview-card')?.classList.add('hidden');
+    document.getElementById('image-controls-card')?.classList.add('hidden');
+    document.getElementById('image-queue-card')?.classList.add('hidden');
+
+    // Show video panels
+    if (selectedVideoFile) {
+      document.getElementById('video-preview-card')?.classList.remove('hidden');
+      document.getElementById('video-dropzone')?.classList.add('hidden');
+    } else {
+      document.getElementById('video-preview-card')?.classList.add('hidden');
+      document.getElementById('video-dropzone')?.classList.remove('hidden');
+    }
+    document.getElementById('video-controls-card')?.classList.remove('hidden');
+  }
+}
+
+// Video receiver handlers
+function handleVideoSelected(file: File): void {
+  selectedVideoFile = file;
+  
+  const videoNameEl = document.getElementById('video-info-name') as HTMLElement;
+  const videoMetaEl = document.getElementById('video-info-meta') as HTMLElement;
+  
+  if (videoNameEl) videoNameEl.textContent = file.name;
+  if (videoMetaEl) videoMetaEl.textContent = `Size: ${formatBytes(file.size)} | Type: ${file.type || 'video/x-generic'}`;
+  
+  document.getElementById('video-dropzone')?.classList.add('hidden');
+  document.getElementById('video-preview-card')?.classList.remove('hidden');
+}
+
+function handleVideoCleared(): void {
+  selectedVideoFile = null;
+  document.getElementById('video-dropzone')?.classList.remove('hidden');
+  document.getElementById('video-preview-card')?.classList.add('hidden');
+}
+
 // Initialize Components
 const compareSlider = new CompareSlider(
   'comparison-container',
@@ -69,6 +140,19 @@ new Dropzone(
   'browse-btn',
   handleFilesSelected
 );
+
+const videoReceiver = new VideoReceiver(
+  'video-dropzone',
+  'video-file-input',
+  'video-browse-btn',
+  'video-clear-btn',
+  handleVideoSelected,
+  handleVideoCleared
+);
+
+// Switch mode event listeners
+document.getElementById('mode-images-btn')?.addEventListener('click', () => switchMode('images'));
+document.getElementById('mode-videos-btn')?.addEventListener('click', () => switchMode('videos'));
 
 
 

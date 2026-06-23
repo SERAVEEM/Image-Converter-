@@ -20,6 +20,18 @@
         </div>
       </header>
 
+      <!-- Mode Switcher -->
+      <div class="mode-switcher-container">
+        <button class="mode-tab active" id="mode-images-btn" data-mode="images">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="tab-icon"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+          Image Converter
+        </button>
+        <button class="mode-tab" id="mode-videos-btn" data-mode="videos">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="tab-icon"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+          Video Converter
+        </button>
+      </div>
+
       <!-- Main Layout Grid -->
       <main class="workspace-grid">
         
@@ -34,6 +46,34 @@
               <h3>Drag and drop your images here</h3>
               <p>Supports PNG, JPG, JPEG up to 20MB</p>
               <button class="btn btn-primary" id="browse-btn">Browse Files</button>
+            </div>
+          </div>
+
+          <!-- Video Drag & Drop Zone -->
+          <div class="glass-card dropzone hidden" id="video-dropzone">
+            <input type="file" id="video-file-input" accept="video/mp4, video/webm, video/quicktime, video/x-msvideo" style="display: none;" />
+            <div class="dropzone-content">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="upload-icon"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+              <h3>Drag and drop your video here</h3>
+              <p>Supports MP4, WebM, MOV, AVI up to 100MB</p>
+              <button class="btn btn-primary" id="video-browse-btn">Browse Video</button>
+            </div>
+          </div>
+
+          <!-- Video Preview / Details Card -->
+          <div class="glass-card preview-card hidden" id="video-preview-card">
+            <div class="video-preview-container" style="display: flex; align-items: center; gap: 1.5rem; padding: 0.5rem;">
+              <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid var(--border-color-hover); padding: 1.25rem; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-glow);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary);"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+              </div>
+              <div class="video-details" style="flex: 1; display: flex; flex-direction: column; gap: 0.35rem;">
+                <h3 id="video-info-name" style="font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin: 0; word-break: break-all;">video_file.mp4</h3>
+                <p id="video-info-meta" style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">Size: 0 MB | Type: video/mp4</p>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.25rem;">
+                  <span class="badge badge-savings-success" style="font-size: 0.8rem; padding: 0.2rem 0.5rem;">Ready for Conversion</span>
+                  <button class="btn btn-danger" id="video-clear-btn" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; border-radius: var(--radius-sm);">Remove</button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -82,7 +122,7 @@
         <section class="panel-right">
           
           <!-- Conversion Configuration Card -->
-          <div class="glass-card controls-card">
+          <div class="glass-card controls-card" id="image-controls-card">
             <h2>Compression Settings</h2>
             
             <div class="control-group">
@@ -110,8 +150,16 @@
             </div>
           </div>
 
+          <!-- Video Configuration Card -->
+          <div class="glass-card controls-card hidden" id="video-controls-card">
+            <h2>Video Compression Settings</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; line-height: 1.5;">
+              Target format: WebM (VP9/AV1). Video conversion options and queue controls will be available here in the next update.
+            </p>
+          </div>
+
           <!-- Queue List & Export Action Card -->
-          <div class="glass-card queue-card">
+          <div class="glass-card queue-card" id="image-queue-card">
             <div class="queue-header">
               <h2>Processing Queue</h2>
               <span class="queue-count" id="queue-count">0 files</span>
