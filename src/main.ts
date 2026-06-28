@@ -5,6 +5,7 @@ import { CompareSlider } from './component/CompareSlider';
 import { Queuelist } from './component/QueueList';
 import { VideoReceiver } from './component/VideoReceiver';
 import { convertImage } from './utils/converterEngine';
+import { convertVideotoWebM } from './utils/videoConverter';
 import { downloadBlob, formatBytes } from './utils/fileHelpers';
 import JSZip from 'jszip';
 
@@ -13,7 +14,6 @@ let selectedFormat: 'webp' | 'avif' = 'webp';
 let compressionQuality = 0.8; // 0.8 represents 80%
 let resolutionScale = 1.0;    // 1.0 represents 100%
 let previewFile: File | null = null;
-let activeMode: 'images' | 'videos' = 'images';
 let selectedVideoFile: File | null = null;
 
 // DOM Elements Selection
@@ -32,6 +32,43 @@ const previewOrigSize = document.getElementById('preview-orig-size') as HTMLElem
 const previewCompSize = document.getElementById('preview-comp-size') as HTMLElement;
 const previewSavings = document.getElementById('preview-savings') as HTMLElement;
 
+//Video Conversion Actions 
+const videoConverterBtn = document.getElementById ('video-convert-btn') as HTMLButtonElement;
+const videoBitsPerSelect = document.getElementById ('video-bitrate-select') as HTMLSelectElement;
+const videoStatusContainer = document.getElementById ('video-status-container') as HTMLElement;
+
+videoConverterBtn.addEventListener('click', async () => {
+  if(!selectedVideoFile) return ;
+
+  //show process status 
+ videoConverterBtn.disabled = true;
+ videoStatusContainer.classList.remove ('hidden');
+
+ try {
+  const bitrate = parseInt(videoBitsPerSelect.value);
+
+  // perfrom convertions
+  const convertedBlob = await convertVideotoWebM (selectedVideoFile, { bitrate });
+
+  //extract original name and save to webM
+  const originalName = selectedVideoFile.name;
+  const extensionIndex = originalName.lastIndexOf('.')
+  const baseName = extensionIndex !== -1 ? originalName.substring(0, extensionIndex) : originalName;
+
+  downloadBlob (convertedBlob, `${baseName}.webm`);
+  }catch(err){
+  console.error('video convertion failed:',err);
+  alert('failed to convert video to WebM');
+  }
+  finally {
+  //restore UI state
+  videoConverterBtn.disabled = false;
+  videoStatusContainer.classList.add('hidden')
+  }
+
+
+  
+});
 /* Helper to update real-time preview size and savings */
 function updatePreviewStats(originalSize: number, compressedSize: number): void {
   previewOrigSize.textContent = formatBytes(originalSize);
@@ -49,8 +86,6 @@ function updatePreviewStats(originalSize: number, compressedSize: number): void 
 
 /* Switches the active view mode and adjusts panel visibility */
 function switchMode(mode: 'images' | 'videos'): void {
-  activeMode = mode;
-
   const imagesTab = document.getElementById('mode-images-btn') as HTMLElement;
   const videosTab = document.getElementById('mode-videos-btn') as HTMLElement;
 
@@ -141,7 +176,7 @@ new Dropzone(
   handleFilesSelected
 );
 
-const videoReceiver = new VideoReceiver(
+new VideoReceiver(
   'video-dropzone',
   'video-file-input',
   'video-browse-btn',
