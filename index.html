@@ -159,11 +159,26 @@
           </div>
 
           <!-- Queue List & Export Action Card -->
-          <div class="glass-card queue-card" id="image-queue-card">
-            <div class="queue-header">
-              <h2>Processing Queue</h2>
-              <span class="queue-count" id="queue-count">0 files</span>
+          <div class="glass-card controls-card hidden" id="video-controls-card">
+            <h2>Video Compression Settings</h2>
+            
+            <div class="control-group" style="margin-top: 1rem;">
+              <label for="video-bitrate-select" style="display: block; margin-bottom: 0.5rem;">Target Bitrate</label>
+              <select id="video-bitrate-select" style="background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.6rem; border-radius: var(--radius-sm); width: 100%; font-size: 0.9rem; outline: none; transition: border-color 0.2s;">
+                <option value="800000" style="background: #1e1e24;">Low (800 Kbps)</option>
+                <option value="1500000" selected style="background: #1e1e24;">Standard (1.5 Mbps)</option>
+                <option value="3000000" style="background: #1e1e24;">High (3.0 Mbps)</option>
+              </select>
             </div>
+            <div style="margin-top: 1.5rem;">
+              <button class="btn btn-primary" id="video-convert-btn" style="width: 100%;">Convert to WebM</button>
+            </div>
+            <!-- Loader & Status Container -->
+            <div id="video-status-container" class="hidden" style="margin-top: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+              <div class="spinner" style="border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--color-primary); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite;"></div>
+              <span id="video-status-text" style="color: var(--text-secondary); font-size: 0.9rem;">Converting video (runs in real-time)...</span>
+            </div>
+          </div>
             
             <!-- Items Container -->
             <div class="queue-list" id="queue-list">
