@@ -1,175 +1,141 @@
-# OptiShift | Premium Local-First Image Converter
+# OptiShift | Premium Local-First Media Optimizer & Converter
 
-OptiShift is a high-fidelity, local-first image optimization and conversion web application. It allows users to convert standard web formats (**PNG**, **JPG**, **JPEG**) into next-generation formats (**WebP**, **AVIF**) directly in their browser. 
+OptiShift is a high-fidelity, local-first media optimization and conversion web application. It enables developers and creators to convert and compress standard images (**PNG**, **JPG**, **JPEG**) into next-generation formats (**WebP**, **AVIF**), and videos (**MP4**, **WebM**, **MOV**, **AVI**) into high-performance **WebM** containers directly inside their browser.
 
-Since all image processing is performed client-side using the browser canvas and WebAssembly (WASM), **no images are ever uploaded to a server**, ensuring 100% privacy, data security, and offline usability.
-
----
-
-## Features
-
-- **100% Client-Side Processing**: Zero server uploads. Heavy operations run locally.
-- **Next-Gen Formats**: Convert images to WebP and AVIF.
-- **WASM-Powered AVIF Encoding**: Native browser engines do not support encoding to AVIF on a canvas. OptiShift uses `@jsquash/avif` (compiled to WebAssembly) to encode high-quality AVIF files directly in the browser.
-- **Interactive Visual Comparison Slider**: A draggable side-by-side slider to inspect the compressed output quality in real time before exporting.
-- **Real-Time Statistics**: Real-time display of original size, estimated compressed size, and percentage savings as quality and format parameters are changed.
-- **Multi-File Batch Queue**: Drop multiple files to queue them up. Process all files in one go.
-- **Zip Export**: Automatically bundles multiple converted images into a single `.zip` archive for easy downloading.
-- **Modern Cyber-Dark UI**: Glassmorphic styling, custom sliders, responsive layouts, and smooth micro-animations.
+Since all media processing is performed client-side using the browser canvas, WebAssembly (WASM), and browser encoding interfaces, **no files are ever uploaded to a server**. This guarantees 100% data privacy, maximum security, and offline utility.
 
 ---
 
-## Tech Stack and Architecture
+## What is this Project?
 
-- **Core Framework**: Vite + TypeScript (running under modern standard ES module bundler setup).
-- **Styles**: Modular Vanilla CSS imports.
-- **AVIF Compression**: WebAssembly (`@jsquash/avif`).
-- **ZIP Packaging**: `JSZip`.
-- **Canvas Rendering**: HTML5 Canvas API for resizing/WebP conversion.
+OptiShift is designed to solve the overhead of remote media compression by running all conversion pipelines natively on the user's hardware. 
 
-### File Structure
+### Key Features:
+- **100% Client-Side Processing**: Zero server uploads. Heavy calculations run locally.
+- **Next-Gen Image Formats**: Convert standard image formats to high-compression WebP and AVIF.
+- **WASM-Powered AVIF Encoding**: Native browser engines do not support direct canvas encoding to AVIF. OptiShift uses `@jsquash/avif` (compiled to WebAssembly) to achieve high-quality AVIF encoding inside the browser.
+- **Browser-Native Video Converter**: Re-encodes videos (MP4, MOV, WebM, AVI) to WebM locally using HTML5 virtual video streams, the `captureStream()` API, and the browser's `MediaRecorder` engine with VP8/VP9 hardware-negotiated codecs.
+- **Interactive Visual Comparison Slider**: A split-screen compare slider that permits real-time previewing of quality loss and compression ratios before exporting.
+- **Batch Image Processing Queue**: Queue multiple image assets, customize quality metrics, and batch-convert them into a single `.zip` bundle.
+- **Sleek Cyber-Dark UI**: Responsive layout featuring CSS glassmorphism, visual indicators, status badges, and fine-grained slider inputs.
 
-```text
-d:/image converter/
-├── index.html                   # HTML structure and UI container shell
-├── package.json                 # Project configuration & npm scripts
-├── plan.md                      # Original project design and specification
-├── tsconfig.json                # TypeScript compiler options
-├── vite.config.ts               # Vite server configurations (worker & dep optimization rules)
-└── src/
-    ├── main.ts                  # App controller and coordinator
-    ├── style.css                # CSS entrypoint importing modular stylesheets
-    ├── jsquash-avif.d.ts        # TS declarations for WebAssembly AVIF encoder
-    ├── assets/                  # Default assets and typescript logo SVG
-    ├── component/               # UI components
-    │   ├── CompareSlider.ts     # Visual comparison before-after slider logic
-    │   ├── Dropzone.ts          # Drag-and-drop / file browser controller
-    │   └── QueueList.ts         # Visual list displaying queue, progress, and success/fail metrics
-    ├── styles/                  # Modular Vanilla CSS stylesheets
-    │   ├── variables.css        # Palette configuration (HSL variables & dark mode variables)
-    │   ├── reset.css            # Base resets
-    │   ├── layout.css           # Workspace structural layouts (grid & flex items)
-    │   ├── cards.css            # Glassmorphic card styling
-    │   ├── buttons.css          # Control triggers and format button groups
-    │   ├── badges.css           # Badges for status, offline labels, and savings statistics
-    │   ├── inputs.css           # Sliders and range inputs
-    │   ├── dropzone.css         # Visual styling for drop zones
-    │   ├── comparison.css       # Slider containers and statistics preview panels
-    │   └── queue.css            # Queue lists and progress indicators
-    └── utils/                   # Utilities & engine APIs
-        ├── converterEngine.ts   # Core canvas scaling and WASM AVIF converter pipeline
-        └── fileHelpers.ts       # Byte sizing layout helpers and browser file download routines
-```
+---
 
-### Component Flow Architecture
+## System Flow & Architecture
+
+OptiShift coordinates components through state updates handled in the main controller, delegating intensive compression routines to local browser web-workers or browser hardware interfaces.
+
+### Media & Control Flow Diagram
 
 ```mermaid
 graph TD
-    User([User]) -->|Drags or Selects Files| DZ[Dropzone Component]
-    DZ -->|Sends File Objects| Main[src/main.ts - App State]
-    Main -->|Pushes Items| QL[QueueList Component]
-    Main -->|Sets Current Preview Image| CS[CompareSlider Component]
-    Main -->|Invokes conversion| CE[converterEngine.ts]
+    User([User]) -->|Interact / Drop files| UI[App UI / Mode Switcher]
+    UI -->|Image Mode| DZ[Dropzone Component]
+    UI -->|Video Mode| VR[VideoReceiver Component]
     
-    CE -->|WebP chosen| Native[Canvas toBlob WebP]
-    CE -->|AVIF chosen| WASM[WASM @jsquash/avif encode]
+    DZ -->|Image Files| Main[src/main.ts - App State]
+    VR -->|Video File| Main
     
-    Native -->|Returns Blob| PreviewStats[Update real-time size & savings]
-    WASM -->|Returns Blob| PreviewStats
+    subgraph Image Conversion Flow
+        Main -->|Selected Image Preview| CS[CompareSlider Component]
+        Main -->|Queued Images| QL[QueueList Component]
+        QL -->|Batch Convert| CE[converterEngine.ts]
+        Main -->|Immediate Preview Render| CE
+        CE -->|WebP Chosen| Canvas[Canvas API toBlob]
+        CE -->|AVIF Chosen| WASM[WASM @jsquash/avif]
+        Canvas -->|Blob| Stats[Update Preview Stats]
+        WASM -->|Blob| Stats
+        Stats -->|URLs| CS
+        QL -->|Converted Blobs| JSZip[JSZip Bundler]
+        JSZip -->|ZIP Blob| DownloadImg([Download ZIP / Single Image])
+    end
     
-    PreviewStats -->|Sets Slider URLs| CS
-    
-    Main -->|Click Convert All| Batch[Batch Convert Queue]
-    Batch -->|Loops Items| CE
-    CE -->|Returns Blobs| Zip[JSZip Archive / Single Download]
-    Zip -->|Triggers Browser Download| Download([Download file / ZIP])
+    subgraph Video Conversion Flow
+        Main -->|Convert Video| VC[videoConverter.ts]
+        VC -->|Create Virtual Player| VideoElement[HTML5 Video Element]
+        VideoElement -->|captureStream| Stream[Canvas/MSE Stream]
+        Stream -->|Encode WebM| MR[MediaRecorder API]
+        MR -->|WebM Chunks| WebMBlob[WebM Blob]
+        WebMBlob -->|Trigger Browser Save| DownloadVid([Download WebM Video])
+    end
 ```
+
+### Module Breakdown
+
+1. **App Controller (`src/main.ts`)**
+   - Coordinates file ingestion, UI rendering modes, active preview selections, slider synchronization, and triggers batch actions.
+2. **Image Conversion Engine (`src/utils/converterEngine.ts`)**
+   - Handles canvas resizing, scaling ratios, native WebP canvas conversion, and handles WebAssembly compilation calls to `@jsquash/avif`.
+3. **Video Conversion Engine (`src/utils/videoConverter.ts`)**
+   - Renders video inputs inside a hidden playback interface, feeds the stream into a native `MediaRecorder` pipeline, and writes WebM chunks.
+4. **Compare Slider (`src/component/CompareSlider.ts`)**
+   - Uses mouse and touch position listeners to slide between the source image overlay and compressed previews in real-time.
+5. **Dropzones & Queue Managers (`src/component/`)**
+   - Manage drag-and-drop actions, UI file inputs, state tracking variables (`pending`, `processing`, `success`, `failed`), and DOM nodes.
 
 ---
 
-## Setup and Installation
+## How to Run Locally
 
 ### Prerequisites
+- **Node.js** (v18.0.0 or higher)
+- **npm** (v9.0.0 or higher)
 
-You must have **Node.js** (v18 or higher recommended) and **npm** installed on your machine.
-
-### 1. Clone & Enter Directory
-
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/SERAVEEM/Image-Converter-.git
-cd "d:/image converter"
+cd "image-converter"
 ```
 
 ### 2. Install Dependencies
-
 ```bash
 npm install
 ```
 
-### 3. Start Development Server
-
+### 3. Start local development server
 ```bash
 npm run dev
 ```
+Once started, the development server will serve the client-side bundle locally. Open `http://localhost:5173/` in your browser.
 
-The app will run locally at `http://localhost:5173/`. Open this URL in a modern web browser (Chrome, Edge, or Firefox).
-
-### 4. Build for Production
-
-To bundle the application for production deployment:
-
+### 4. Build and Preview for Production
+To test production optimization rules locally:
 ```bash
 npm run build
+npm run preview
 ```
-
-This creates a static production bundle in the `dist/` directory, which can be hosted on any static file server (Netlify, Vercel, GitHub Pages, etc.).
-
----
-
-## Core Modules Breakdown
-
-### 1. Conversion Engine (`src/utils/converterEngine.ts`)
-
-Converts a `File` object using custom option inputs:
-- **WebP Encoding**: Handled natively by the browser's Canvas API:
-  ```typescript
-  canvas.toBlob((blob) => { ... }, 'image/webp', quality);
-  ```
-- **AVIF Encoding**: Handled by `@jsquash/avif` since browsers don't support native canvas encoding to AVIF.
-  - Draws the image to canvas at the scaled size.
-  - Extracts the raw `ImageData` via `ctx.getImageData(...)`.
-  - Dynamically imports the WASM AVIF encoder module.
-  - Maps user quality (`0.0` - `1.0`) to standard AVIF `cqLevel` (`63` - `0` where 0 is lossless/best quality and 63 is lowest).
-  - Performs multi-threaded WASM compilation and produces an `ArrayBuffer` which is wrapped in an `image/avif` MIME Blob.
-
-### 2. Comparison Slider (`src/component/CompareSlider.ts`)
-
-Features a split comparison slider:
-- Displays the original image on the left and the compressed output on the right.
-- Uses mouse and touch movement listeners (`mousedown`, `mousemove`, `mouseup`, `touchstart`, `touchmove`, `touchend`) to adjust the split percentage.
-- Dynamically resizes the overlay width (`afterWrapperEl.style.width`) and handle position in real-time, functioning natively on desktop and mobile screens.
-
-### 3. Queue Manager (`src/component/QueueList.ts`)
-
-Manages and displays multiple files queued for conversion:
-- Tracks individual file state (`pending`, `processing`, `success`, `failed`).
-- Computes progress and displays real-time layout updates inside the sidebar.
-- Computes actual byte size savings (e.g. `Saved 82%`) and formats values dynamically using helper routines.
-
-### 4. Style Customization (`src/styles/variables.css`)
-
-OptiShift leverages a variable-driven CSS ecosystem that implements:
-- A dark backdrop (`#070a13`).
-- Semitransparent cards using `backdrop-filter: blur(12px)` and subtle glowing borders (`var(--border-color-glow)`).
-- Distinct color accents representing statuses (`--color-success` for green, `--color-error` for red, `--color-primary` for indigo).
-- Custom Google Font `Outfit` to deliver premium visual aesthetics.
+This builds static artifacts into `dist/` and runs a local preview server mimicking standard hosting behaviors.
 
 ---
 
-## Security and Privacy
+## How to Contribute
 
-Since OptiShift performs all compression tasks using the CPU and GPU of the local client machine:
-- **No data leaves your device**.
-- No telemetry, analytics, or image caching tracking scripts are embedded.
-- Can run fully offline in a sandbox or flight mode after loading.
-yeah
+We welcome contributions to OptiShift! Follow these guidelines to maintain project quality.
+
+### Core Architectural Rules
+- **100% Client-Side**: No features should depend on remote servers, APIs, or databases. All computations must happen in the browser.
+- **TypeScript First**: All components and helpers must be written in strongly-typed TypeScript.
+- **Modular Stylesheets**: Styles are organized into specific modules under `src/styles/` (e.g., `inputs.css`, `cards.css`). Do not use TailwindCSS or utility libraries; write raw, high-performance modular CSS.
+- **Performance & Security First**: Avoid heavy dependencies. Check if standard browser APIs (like Canvas, MediaRecorder, or JSZip) cover requirements before installing packages.
+
+### Development Workflow
+1. **Fork the Repository**: Create a fork of the repository on GitHub.
+2. **Create a Feature Branch**:
+   ```bash
+   git checkout -b feature/your-awesome-feature
+   ```
+3. **Make and Test Your Changes**:
+   - Write clean, documented code.
+   - Test changes across multiple browsers (specifically Canvas rendering and video codec compatibility in Chrome/Safari/Firefox).
+4. **Verify the Production Build**:
+   Ensure TypeScript checking and Vite compilation pass cleanly without errors:
+   ```bash
+   npm run build
+   ```
+5. **Commit and Push**:
+   Keep commit messages brief and descriptive:
+   ```bash
+   git commit -m "feat: add video bitrate selector custom input"
+   git push origin feature/your-awesome-feature
+   ```
+6. **Submit a Pull Request**: Submit a PR to the main branch detailing the purpose and validation of your changes.
